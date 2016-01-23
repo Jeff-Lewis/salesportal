@@ -1,0 +1,60 @@
+<div class="panel panel-default"  ng-init="InitView()">
+  <div class="panel-heading">
+    <h3 class="panel-title">Produtos</h3>
+  </div>
+  <div class="panel-body">
+    <form method="POST" style="height: auto" ng-show="NewReg">
+      <div class="form-group">
+        <input class="form-control" type="text" placeholder="Cód. Produto" name="txtcode" ng-model="model.code" />
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" placeholder="Descrição" name="txtdescription" ng-model="model.description" />
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="txtunitmeasurement">Unidade de medida:</label>
+        <select class="control-label col-sm-2" id="txtunitmeasurement" name="txtstatus" ng-model="model.unitmeasurement">
+          <option ng-repeat="r in dataUnit" selected="{{ $index == 0  }}" value="{{ r.prefix }}">{{ r.description }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" placeholder="Valor" price name="txtvalue" ng-model="model.value"  />
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary" ng-click="PostData()">Salvar</button>
+        <button class="btn btn-warning" ng-click="CancelRegister()">Cancelar</button>
+      </div>
+    </form>
+
+
+    <div class="panel panel-default" ng-show="!NewReg" >
+      <div class="panel-heading">
+        <button class="btn btn-primary" ng-click="NewRegister()" >Novo</button>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Cód. Produto</th>
+            <th>Descrição</th>
+            <th>Unidade de Medida</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="r in data">
+            <td class="MenuButtons"><button class="btn btn-default" ng-click="LoadRegister($index)" >Editar</button>
+                                    <button class="btn btn-danger" ng-click="DeleteRegister($index)" >Excluir</button></td>
+            <td ng-bind="r.code"></td>
+            <td ng-bind="r.description"></td>
+            <td ng-bind="r.unitmeasurement"></td>
+            <td ng-bind="r.value| currency:'R$ '"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="panel-footer">
+        <button ng-show="deletedata.length > 0" class="btn btn-success"  ng-click="RestoreRegister()">Restaurar</button>
+        Produtos: ({{ data.length }})
+      </div>
+    </div>
+  </div>
+</div>

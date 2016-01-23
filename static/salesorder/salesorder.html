@@ -1,0 +1,245 @@
+<div class="panel panel-default"  ng-init="InitPage()">
+    <div class="panel-heading">
+        <h3 class="panel-title">Pedido de Venda</h3>
+    </div>
+    <div class="panel-body">
+        <div ng-show="NewReg">
+            <form method="POST" style="height: auto" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="txtclientname">Cliente:</label>
+                    <input  ng-disabled="true" id="txtclientname" name="txtclientname" ng-model="client.clientname" type="text"
+                           class="control-label col-sm-6" placeholder="Cliente" />
+                    <button type="button" class="btn btn-default" aria-label="Left Align"
+                            data-toggle="modal" data-target="#ModalClients" ng-click="searchClient()">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="txtdate">Data do Pedido:</label>
+                    <input id="txtdate" name="txtdate" ng-model="salesorder.date"
+                           type="text"
+                           class="control-label col-sm-2" placeholder="Data do Pedido" />
+                    <label class="control-label col-sm-2" for="txtmodifieddate">Data de Modificação:</label>
+                    <input ng-disabled="true" id="txtmodifieddate" name="txtmodifieddate" ng-model="salesorder.modifieddate"
+                           type="text"
+                           class="control-label col-sm-2" placeholder="Data de Modificação" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="txtstatus">Status:</label>
+                    <select class="control-label col-sm-2" id="txtstatus" name="txtstatus" ng-model="salesorder.status" ng-disabled="true">
+                        <option value="0">Pendente</option>
+                        <option value="1">Aprovado</option>
+                        <option value="2">Reprovado</option>
+                        <option value="3">Concluído</option>
+                    </select>
+                    <label class="control-label col-sm-2" for="txtquantityitems">Qtd. Itens:</label>
+                    <input ng-disabled="true" id="txtquantityitems" name="txtquantityitems" ng-model="salesorder.quantityitems" type="text"
+                           class="control-label col-sm-2" placeholder="Qtd. Itens" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="txttotalvalue">Valor Total:</label>
+                    <input ng-disabled="true" id="txttotalvalue" name="txttotalvalue" ng-model="salesorder.totalvalue" type="text"
+                           class="control-label col-sm-2" placeholder="Valor Total" />
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-2" for="txtstatus"></div>
+                    <button class="btn btn-primary " ng-click="PostData()">Salvar</button>
+                    <button class="btn btn-warning" ng-click="CancelRegister()">Cancelar</button>
+                </div>
+            </form>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <button class="btn btn-primary" ng-show="!EditReg" data-toggle="modal" data-target="#ModalProducts" >Novo</button>
+                    Itens do Pedido
+
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Index</th>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Valor</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="r in dataitems" ng-show="!EditReg">
+                            <td><button class="btn btn-default" ng-click="EditOrderItem(r.index)" >Editar</button>
+                                <button class="btn btn-danger" ng-click="DeleteOrderItem(r.index)" >Excluir</button></td>
+                            <td ng-bind="r.index"></td>
+                            <td ng-bind="r.iditem.description"></td>
+                            <td ng-bind="r.quantity|number:3"></td>
+                            <td ng-bind="r.value|currency:'R$ '"></td>
+                            <td ng-bind="r.totalitem|currency:'R$ '"></td>
+                        </tr>
+                        <tr ng-show="EditReg">
+                            <td><button class="btn btn-primary" ng-click="SaveOrderItem(salesorderitem.index)" >Salvar</button>
+                                <button class="btn btn-warning" ng-click="CancelOrderItem()" >Cancelar</button></td>
+                            <td ng-bind="salesorderitem.index"></td>
+                            <td ng-bind="salesorderitem.iditem.description"></td>
+                            <td>
+                                <input width="100%" id="txtitemquantity" name="txtitemquantity" ng-model="salesorderitem.quantity"
+                                       type="text" placeholder="Quantidade" />
+                            </td>
+                            <td>
+                                <input width="100%" id="txtitemvalue" name="txtitemvalue" ng-model="salesorderitem.value"
+                                       type="text" placeholder="Valor" />
+                            </td>
+                            <td>
+                                <input width="100%" id="txtitemtotalitem" name="txtitemtotalitem" ng-model="salesorderitem.totalitem"
+                                       type="text" placeholder="Total Item"  ng-disabled="true"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr ng-show="!EditReg">
+                            <td colspan="3"></td>
+                            <td>{{ SumItems('qty') | number:3 }}</td>
+                            <td></td>
+                            <td>{{ SumItems('totalvalue') | currency: 'R$ ' }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="panel-footer">
+                    <button ng-show="deleteitemOrder.length > 0" class="btn btn-success"  ng-click="RestoreOrderItem()">Restaurar</button>
+                    Itens: ({{ NumItems }})
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ModalClients" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" >
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Selecione o Cliente</h4>
+                        <hr/>
+                        <input name="txtsearchClient" ng-model="txtsearchClient" type="text"
+                               class="form-control" placeholder="Cliente" aria-describedby="txtsearchClient" />
+                    </div>
+                    <div class="modal-body scroll-panel" style="height: 300px" >
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Index</th>
+                                <th>Nome</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="r in dataclient | filter : txtsearchClient">
+                                <td><input type="checkbox" ng-value="r._id" ng-model="r.checked" ng-click="ckeClientChange($index)" /></td>
+                                <td ng-bind="$index+1"></td>
+                                <td ng-bind="r.name"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" ng-click="clientConfirm()" data-dismiss="modal">OK</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="ModalProducts" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" >
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Selecione o Produto</h4>
+                        <hr/>
+                        <input name="txtsearchProduct" ng-model="txtsearchProduct" type="text"
+                               class="form-control" placeholder="Produto" aria-describedby="txtsearchProduct" />
+                    </div>
+                    <div class="modal-body scroll-panel" style="height: 300px" >
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Index</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="r in dataproduct | filter : txtsearchProduct">
+                                <td><input type="checkbox" ng-value="r._id"  ng-model="r.checked" ng-click="ckeProductChange($index)" /></td>
+                                <td ng-bind="$index+1"></td>
+                                <td ng-bind="r.description"></td>
+                                <td ng-bind="r.value | currency:'R$ '"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" ng-click="productConfirm()" data-dismiss="modal">OK</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default" ng-show="!NewReg" >
+            <div class="panel-heading" >
+                <button class="btn btn-primary" ng-click="NewRegister()" >Novo</button>
+            </div>
+            <div class="scroll-panel">
+                <ul ng-repeat="r in data">
+                    <li>
+                        <div  style=" width:100%">
+                            <div class="col-md-8" style="border-top: solid 1px #DDD; padding-top: 15px; margin-top: 15px; margin-bottom: 15px">
+                                <p><span>Index: </span>{{ $index +1 }}</p>
+                                <p><span>Cliente: </span>{{r.idclient.name  }}</p>
+                                <p><span>Data do Pedido: </span>{{ r.date|date:'dd/MM/yyyy' }}</p>
+                                <p><span>Data de Modificação: </span>{{ r.modifieddate|date:'dd/MM/yyyy HH:mm:ss' }}</p>
+                                <p><span>Status: </span>{{ DecodeStatus(r.status)  }}</p>
+                                <p><span>Qtd. Itens: </span>{{ r.quantityitems }}</p>
+                                <p><span>Valor Total: </span>{{ r.totalvalue | currency:'R$ ' }}</p>
+                            </div>
+                            <div class="col-md-4" style="border-top: solid 1px #DDD;  padding-top: 15px; margin-top: 15px; margin-bottom: 15px">
+                                <button class="btn btn-primary" ng-click="NewRegister()" >Novo</button>
+                                <button class="btn btn-default" ng-click="EditRegister(r._id)" >Editar</button>
+                                <button class="btn btn-danger" ng-click="DeleteRegister($index)" >Excluir</button>
+                            </div>
+                            <div class="col-md-12" style="margin-top: 15px">
+                                <span>Itens do Pedido</span>
+                                <table style=" width:100%">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Index</th>
+                                        <th>Produto</th>
+                                        <th>Quantidade</th>
+                                        <th>Valor</th>
+                                        <th>Valor Total</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="s in r.items">
+                                        <td></td>
+                                        <td ng-bind="$index +1"></td>
+                                        <td ng-bind="s.iditem.description"></td>
+                                        <td ng-bind="s.quantity|number:3"></td>
+                                        <td ng-bind="s.value|currency:'R$ '"></td>
+                                        <td ng-bind="s.totalitem|currency:'R$ '"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel-footer">
+                <button ng-show="deletedata.length > 0" class="btn btn-success"  ng-click="RestoreRegister()">Restaurar</button>
+                Pedidos de venda: ({{ NumOrders }})
+            </div>
+        </div>
+    </div>
+</div>

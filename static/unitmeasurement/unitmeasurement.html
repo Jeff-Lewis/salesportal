@@ -1,0 +1,51 @@
+<div class="panel panel-default"  ng-init="LoadGrid()">
+    <div class="panel-heading">
+        <h3 class="panel-title">Unidade de medida</h3>
+    </div>
+    <div class="panel-body">
+        <form method="POST" style="height: auto" ng-show="NewReg">
+            <div class="form-group">
+                <input class="form-control" type="text" placeholder="Cód. Unidade" name="txtprefix" ng-model="model.prefix" />
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" placeholder="Descrição" name="txtdescription" ng-model="model.description" />
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="text" placeholder="Fator" price name="txtfactor" ng-model="model.factor"  />
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" ng-click="PostData()">Salvar</button>
+                <button class="btn btn-warning" ng-click="CancelRegister()">Cancelar</button>
+            </div>
+        </form>
+
+        <div class="panel panel-default" ng-show="!NewReg" >
+            <div class="panel-heading">
+                <button class="btn btn-primary" ng-click="NewRegister()" >Novo</button>
+            </div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Cód. Unidade</th>
+                    <th>Descrição</th>
+                    <th>Fator</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="r in data">
+                    <td class="MenuButtons"><button class="btn btn-default" ng-click="LoadRegister($index)" >Editar</button>
+                        <button class="btn btn-danger" ng-click="DeleteRegister($index)" >Excluir</button></td>
+                    <td ng-bind="r.prefix"></td>
+                    <td ng-bind="r.description"></td>
+                    <td ng-bind="r.factor| number"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="panel-footer">
+                <button ng-show="deletedata.length > 0" class="btn btn-success"  ng-click="RestoreRegister()">Restaurar</button>
+                Produtos: ({{ data.length }})
+            </div>
+        </div>
+    </div>
+</div>
